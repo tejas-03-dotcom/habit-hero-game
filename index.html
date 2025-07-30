@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Habit Hero – Help Grandma</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #cceeff; overflow: hidden; }
+    canvas { display: block; margin: 0 auto; background: #fff; }
+    .choices { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); }
+    button { font-size: 18px; padding: 10px 20px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
+  <div class="choices" id="choices" style="display:none;">
+    <button onclick="choose('help')">Help Grandma</button>
+    <button onclick="choose('ignore')">Ignore</button>
+  </div>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const heroImg = new Image();
+    const grandmaImg = new Image();
+    const bgImg = new Image();
+    heroImg.src = "assets/hero.png";
+    grandmaImg.src = "assets/grandma.png";
+    bgImg.src = "assets/bg_home.png";
+
+    let heroX = 0, heroY = 300;
+    let moveIn = true, chosen = false;
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bgImg, 0, 0, 800, 500);
+      ctx.drawImage(grandmaImg, 550, 300, 150, 150);
+      ctx.drawImage(heroImg, heroX, heroY, 120, 120);
+
+      if (moveIn && heroX < 300) {
+        heroX += 2;
+        requestAnimationFrame(gameLoop);
+      } else if (!chosen) {
+        document.getElementById("choices").style.display = "block";
+        speak("Oh no! Grandma dropped the laundry. What should you do?");
+        chosen = true;
+      }
+    }
+
+    function choose(action) {
+      document.getElementById("choices").style.display = "none";
+      if (action === "help") {
+        speak("Great job! You helped Grandma. You earned a star!");
+        alert("🌟 You helped Grandma!");
+      } else {
+        speak("That's not nice. Let's try to be more helpful next time.");
+        alert("😞 You ignored her...");
+      }
+    }
+
+    bgImg.onload = () => gameLoop();
+  </script>
+</body>
+</html>
